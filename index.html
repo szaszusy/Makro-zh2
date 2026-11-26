@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="hu" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Makroökonómia ZH Felkészítő Kvíz</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200 selection:bg-indigo-500 selection:text-white">
+
+  <!-- Felső navigációs sáv -->
+  <header class="sticky top-0 z-30 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <button id="homeBtn" type="button" class="flex items-center gap-2.5 text-left group focus:outline-none">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-lg shadow-sm group-hover:bg-indigo-700 transition">
+          M
+        </div>
+        <div>
+          <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900 dark:text-white">Makroökonómia ZH</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Interaktív vizsgafelkészítő (80 egyedi kérdés)</p>
+        </div>
+      </button>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Élő pontszám kijelző kvíz közben -->
+        <div id="liveStatsBadge" class="hidden items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs sm:text-sm font-semibold">
+          <span class="text-emerald-600 dark:text-emerald-400" id="liveCorrect">0 helyes</span>
+          <span class="text-slate-300 dark:text-slate-600">|</span>
+          <span class="text-indigo-600 dark:text-indigo-400" id="livePercent">0%</span>
+        </div>
+
+        <!-- Főmenü gomb kvíz közben -->
+        <button id="backToMenuBtn" type="button" class="hidden px-3 py-2 rounded-xl text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          Témakörök
+        </button>
+
+        <!-- Sötét / világos mód váltó -->
+        <button id="themeToggleBtn" type="button" aria-label="Téma váltása" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+          <!-- Nap ikon (sötét módban látszik) -->
+          <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+          </svg>
+          <!-- Hold ikon (világos módban látszik) -->
+          <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Fő tartalom -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10 flex flex-col justify-center">
+
+    <!-- 1. KEZDŐKÉPERNYŐ / TÉMAKÖRVÁLASZTÓ -->
+    <section id="menuView" class="space-y-6">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 dark:border-slate-800">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="space-y-2 max-w-xl">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300">
+              Duplikációk kiszűrve • 80 egyedi kérdés
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              Válassz gyakorlási módot!
+            </h2>
+            <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400">
+              Kattintgatós tanulókártyák azonnali visszajelzéssel és közgazdasági magyarázatokkal. A végén külön újrapróbálhatod csak a elrontott kérdéseket.
+            </p>
+          </div>
+
+          <!-- Beállítás kapcsoló -->
+          <div class="flex flex-col gap-3 shrink-0">
+            <button id="startAllShuffledBtn" type="button" class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-base shadow-md shadow-indigo-600/20 transition flex items-center justify-center gap-2.5">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+              Összes kérdés (keverve)
+            </button>
+
+            <label class="inline-flex items-center justify-center sm:justify-start gap-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-400 cursor-pointer select-none px-1">
+              <input id="shuffleOptionsToggle" type="checkbox" checked class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-700 dark:bg-slate-800" />
+              <span>Válaszlehetőségek sorrendjének keverése</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Témakör kártyák -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="topicCardsGrid">
+        <!-- JS tölti fel dinamikusan -->
+      </div>
+    </section>
+
+    <!-- 2. KVÍZ FELÜLET -->
+    <section id="quizView" class="hidden space-y-5">
+      <!-- Haladásjelző -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
+          <span id="quizTopicTag" class="font-semibold px-3 py-1 rounded-lg bg-indigo-50 text-indigo-700 dark:bg-indigo-950/80 dark:text-indigo-300">
+            Témakör
+          </span>
+          <span id="quizProgressText" class="font-bold text-slate-700 dark:text-slate-300">
+            1 / 80 kérdés
+          </span>
+        </div>
+        <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div id="quizProgressBar" class="h-full bg-indigo-600 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Kérdés kártya -->
+      <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-6">
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <span id="questionTypeBadge" class="text-xs font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+              Feleletválasztós
+            </span>
+          </div>
+          <h3 id="questionText" class="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-snug">
+            Kérdés szövege...
+          </h3>
+        </div>
+
+        <!-- Válaszopciók konténere -->
+        <div id="optionsContainer" class="space-y-3">
+          <!-- Dinamikusan generált gombok -->
+        </div>
+
+        <!-- Több válaszos kérdés beküldő gombja -->
+        <div id="multiSubmitWrapper" class="hidden pt-1">
+          <button id="submitMultiBtn" type="button" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:pointer-events-none text-white font-semibold text-sm sm:text-base shadow-sm transition">
+            Válaszok ellenőrzése
+          </button>
+        </div>
+
+        <!-- Azonnali visszajelzés és magyarázat doboz -->
+        <div id="feedbackBox" class="hidden rounded-2xl p-4 sm:p-5 border transition-all duration-200">
+          <div class="flex items-start gap-3">
+            <div id="feedbackIcon" class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 font-bold text-sm">
+              ✓
+            </div>
+            <div class="space-y-1">
+              <p id="feedbackTitle" class="font-bold text-base">Helyes válasz!</p>
+              <p id="feedbackExplanation" class="text-sm leading-relaxed opacity-95">Magyarázat szövege...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alsó navigáció: Következő kérdés gomb -->
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800">
+          <p class="text-xs text-slate-400 dark:text-slate-500 hidden sm:block">
+            Tipp: Használhatod az <kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-slate-600 dark:text-slate-300">Enter</kbd> vagy <kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-slate-600 dark:text-slate-300">Szóköz</kbd> billentyűt a továbblépéshez.
+          </p>
+          <button id="nextQuestionBtn" type="button" disabled class="w-full sm:w-auto ml-auto px-7 py-3.5 rounded-2xl bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 disabled:opacity-35 disabled:pointer-events-none text-white font-bold text-sm sm:text-base transition flex items-center justify-center gap-2">
+            <span id="nextBtnLabel">Következő kérdés</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ÖSSZESÍTŐ EREDMÉNYKÁRTYA -->
+    <section id="resultView" class="hidden space-y-6">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 dark:border-slate-800 text-center space-y-6">
+        <div class="space-y-2">
+          <span id="resultBadge" class="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+            Teszt befejezve
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+            Összesített eredményed
+          </h2>
+        </div>
+
+        <!-- Fő mutatók -->
+        <div class="grid grid-cols-3 gap-3 sm:gap-5 max-w-lg mx-auto">
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-800">
+            <div id="finalScoreText" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">0 / 0</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Helyes válasz</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50">
+            <div id="finalPercentText" class="text-xl sm:text-2xl font-extrabold text-indigo-600 dark:text-indigo-400">0%</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Teljesítmény</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50">
+            <div id="finalWrongCount" class="text-xl sm:text-2xl font-extrabold text-rose-600 dark:text-rose-400">0</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Hibás kérdés</div>
+          </div>
+        </div>
+
+        <!-- Témakörönkénti bontás -->
+        <div class="text-left max-w-2xl mx-auto space-y-3 pt-2">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Teljesítmény témakörönként
+          </h3>
+          <div id="topicBreakdownContainer" class="space-y-3">
+            <!-- JS tölti fel -->
+          </div>
+        </div>
+
+        <!-- Akciógombok -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <button id="retryWrongBtn" type="button" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm sm:text-base shadow-sm transition flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            <span id="retryWrongLabel">Csak a hibás kérdések újrapróbálása</span>
+          </button>
+
+          <button id="restartSameModeBtn" type="button" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm sm:text-base transition">
+            Újrakezdés elölről
+          </button>
+
+          <button id="resultToMenuBtn" type="button" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm sm:text-base transition">
+            Vissza a témakörökhöz
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // =========================================================================
+    // 1. KÉRDÉSBANK (80 egyedi kérdés, duplikációk kiszűrve)
+    // =========================================================================
+    const TOPICS = [
+      {
+        id: 1,
+        title: "Fogyasztási elméletek és megtakarítás",
+        shortTitle: "1. Fogyasztás és megtakarítás",
+        description: "Keynes-i, életciklus, relatív és permanens jövedelem hipotézis, fogyasztási és megtakarítási határhajlandóság.",
+        accent: "indigo"
+      },
+      {
+        id: 2,
+        title: "Pénz, pénzpiac és infláció",
+        shortTitle: "2. Pénz, pénzpiac és infláció",
+        description: "Pénzaggregátumok (M1, M2), pénzmultiplikátor, forgási sebesség, pénzkeresleti motívumok és az infláció költségei.",
+        accent: "emerald"
+      },
+      {
+        id: 3,
+        title: "Fiskális és monetáris politika, IS–LM modell",
+        shortTitle: "3. Fiskális/monetáris politika, IS–LM",
+        description: "IS- és LM-görbék eltolódásai, multiplikátorok, kiszorítási hatás, államadósság és gazdaságpolitikai mixek.",
+        accent: "amber"
+      },
+      {
+        id: 4,
+        title: "AD–AS modell, munkaerőpiac és infláció–munkanélküliség",
+        shortTitle: "4. AD–AS modell és munkaerőpiac",
+        description: "Ragadós nominálbérek, SRAS és LRAS eltolódások, sokkok kezelése, stagfláció és Phillips-görbe átváltás.",
+        accent: "rose"
+      }
+    ];
+
+    // type: 'single' | 'tf' | 'multi'
+    const QUESTIONS = [
+      // --- TÉMAKÖR 1: Fogyasztási elméletek és megtakarítás (1–11) ---
+      {
+        id: 1,
+        topic: 1,
+        type: "single",
+        question: "Melyik fogyasztási elmélet magyarázza azt, hogy a jövedelmem csökkenése után is a korábbi magas fogyasztási szintemhez közeli életszínvonalat próbálok fenntartani a megtakarításaim felhasználásával?",
+        options: [
+          "Keynes-i jövedelem hipotézis",
+          "Permanens jövedelem hipotézis",
+          "Relatív jövedelem hipotézis",
+          "Életciklus hipotézis"
+        ],
+        correct: [2],
+        explanation: "Duesenberry relatív jövedelem hipotézise (racsnihatás) szerint a fogyasztás a korábban elért legmagasabb jövedelemhez és életszínvonalhoz igazodik."
+      },
+      {
+        id: 2,
+        topic: 1,
+        type: "single",
+        question: "Melyik fogyasztási elmélet feltételezi, hogy az egyének életük végéig azonos fogyasztási szintet szeretnének tartani?",
+        options: [
+          "Keynes-i jövedelem hipotézis",
+          "Permanens jövedelem hipotézis",
+          "Relatív jövedelem hipotézis",
+          "Életciklus hipotézis"
+        ],
+        correct: [3],
+        explanation: "Modigliani életciklus elmélete szerint az egyének a teljes élettartamukra egyenletes fogyasztási pályát terveznek."
+      },
+      {
+        id: 3,
+        topic: 1,
+        type: "single",
+        question: "Ha a fogyasztási határhajlandóság 0,1 egységgel nő, mit mond ez nekünk az egyének megtakarítási magatartásának változásáról?",
+        options: [
+          "Csökken a megtakarítási hajlandóság",
+          "Nő a megtakarítási hajlandóság",
+          "Nincs hatással a megtakarítási hajlandóságra"
+        ],
+        correct: [0],
+        explanation: "Mivel ĉ + ŝ = 1, ha a pótlólagos jövedelem nagyobb hányadát költik el fogyasztásra, a megtakarítási határhajlandóság ugyanennyivel csökken."
+      },
+      {
+        id: 4,
+        topic: 1,
+        type: "single",
+        question: "Az életciklus elmélet szerint mivel biztosítjuk állandó életszínvonalunkat?",
+        options: [
+          "Hitellel",
+          "Felhalmozott vagyonunkból",
+          "Átmeneti jövedelemkiegészítésekkel"
+        ],
+        correct: [1],
+        explanation: "Aktív munkavállalói éveinkben megtakarítunk és vagyont halmozunk fel, amelyből nyugdíjas korunkban finanszírozzuk a fogyasztásunkat."
+      },
+      {
+        id: 5,
+        topic: 1,
+        type: "single",
+        question: "Válassza ki az alábbiak közül, hogy melyik igaz!",
+        options: [
+          "a megtakarítási hányad és a megtakarítási határhajlandóság megegyezik egymással",
+          "a fogyasztási és a megtakarítási hányad összege 1",
+          "a megtakarítási határhajlandóság megmutatja, hogy a jövedelem mekkora részét takarítjuk meg"
+        ],
+        correct: [1],
+        explanation: "A rendelkezésre álló jövedelem vagy fogyasztásra (C/Y), vagy megtakarításra (S/Y) megy el, így a két hányad összege mindig 1."
+      },
+      {
+        id: 6,
+        topic: 1,
+        type: "single",
+        question: "Ha a magánszereplők pótlólagos jövedelmük 60%-át fogyasztják el, akkor...",
+        options: [
+          "a fogyasztási határhajlandóság 0,6",
+          "a fennmaradó 40%-ot a megtakarításokból vonják el fogyasztási céllal",
+          "a megtakarítási hányad 0,4"
+        ],
+        correct: [0],
+        explanation: "A pótlólagos (többlet) jövedelem fogyasztásra fordított hányada definíció szerint a fogyasztási határhajlandóság (ĉ = 0,6)."
+      },
+      {
+        id: 7,
+        topic: 1,
+        type: "single",
+        question: "A Keynes-i fogyasztási elmélet szerint a fogyasztás...",
+        options: [
+          "az adott évi jövedelem függvénye",
+          "az adott időszaki és a korábbi jövedelmek függvénye",
+          "a kamatláb függvénye"
+        ],
+        correct: [0],
+        explanation: "Keynes abszolút jövedelem hipotézise szerint a háztartások fogyasztását elsősorban az adott időszaki (folyó) rendelkezésre álló jövedelem határozza meg."
+      },
+      {
+        id: 8,
+        topic: 1,
+        type: "single",
+        question: "Az életciklus elmélet szerint Eszter fogyasztását...",
+        options: [
+          "úgy alakítja, hogy nyugdíjas éveiben is ugyanazon a megszokott életszínvonalon tudjon élni",
+          "az adott évi jövedelme függvényében alakítja",
+          "az elmúlt tíz év jövedelmeinek súlyozott átlaga alapján alakítja"
+        ],
+        correct: [0],
+        explanation: "Az életciklus hipotézis lényege a fogyasztás kisimítása az aktív és az inaktív (nyugdíjas) életszakaszok között."
+      },
+      {
+        id: 9,
+        topic: 1,
+        type: "single",
+        question: "A relatív jövedelem hipotézis szerint Eszter fogyasztása...",
+        options: [
+          "az addig elért legmagasabb jövedelmétől is függ",
+          "a jövedelmével arányosan csökken",
+          "az adott időszaki jövedelem függvénye"
+        ],
+        correct: [0],
+        explanation: "A fogyasztók nehezen adják fel a korábban megszokott életszínvonalukat, így a múltbeli csúcsjövedelem is befolyásolja a fogyasztásukat."
+      },
+      {
+        id: 10,
+        topic: 1,
+        type: "tf",
+        question: "A permanens jövedelem hipotézis szerint a fogyasztás alapját a tartós jövedelem súlyozott átlaga képezi.",
+        options: ["Igaz", "Hamis"],
+        correct: [0],
+        explanation: "Igaz: Milton Friedman elmélete szerint a fogyasztás a hosszú távon várható, tartós (permanens) jövedelemtől függ, nem az átmeneti kilengésektől."
+      },
+      {
+        id: 11,
+        topic: 1,
+        type: "tf",
+        question: "A kölcsönforrások piacon egyensúlyban a megtakarítások és a beruházások egyenlőek egymással.",
+        options: ["Igaz", "Hamis"],
+        correct: [0],
+        explanation: "Igaz: A kölcsönforrások kínálatát a megtakarítások (S), keresletét pedig a beruházások (I) adják; egyensúlyban S = I."
+      },
+
+      // --- TÉMAKÖR 2: Pénz, pénzpiac és infláció (12–35) ---
+      {
+        id: 12,
+        topic: 2,
+        type: "single",
+        question: "A mai pénz...",
+        options: [
+          "belső értékkel bír",
+          "bizalmi pénz",
+          "nagyrészt papír alapú"
+        ],
+        correct: [1],
+        explanation: "A modern pénz belső áruérték nélküli rendeleti (bizalmi) pénz, amelynek elfogadottsága a kibocsátó és a gazdaság iránti bizalmon alapul."
+      },
+      {
+        id: 13,
+        topic: 2,
+        type: "tf",
+        question: "A mai pénznek nincs belső értéke.",
+        options: ["Igaz", "Hamis"],
+        correct: [0],
+        explanation: "Igaz: A bankjegyek, érmék és a számlapénz anyagértéke elhanyagolható a névértékükhöz képest."
+      },
+      {
+        id: 14,
+        topic: 2,
+        type: "tf",
+        question: "A termékek értékének árban történő kifejezése a pénz értékmérő funkciójához kapcsolódik.",
+        options: ["Igaz", "Hamis"],
+        correct: [0],
+        explanation: "Igaz: Az értékmérő funkció révén az áruk és szolgáltatások értékét egyetlen közös mértékegységben (pénzben, azaz árban) fejezzük ki."
+      },
+      {
+        id: 15,
+        topic: 2,
+        type: "single",
+        question: "Ha kiveszek 100 ezer Forintot a széfből és berakom a bankba (látra szóló betétbe), hogyan változott az M1?",
+        options: [
+          "Nőtt 100 ezer Forinttal",
+          "Csökkent 100 ezer Forinttal",
+          "Nem változott"
+        ],
+        correct: [2],
+        explanation: "Az M1 a készpénz és a látra szóló betétek összege: a készpénz 100 ezer Ft-tal csökkent, a látra szóló betét 100 ezer Ft-tal nőtt, így az összegük változatlan."
+      },
+      {
+        id: 16,
+        topic: 2,
+        type: "single",
+        question: "Az M1...",
+        options: [
+          "a kvázi pénz",
+          "a szűkebb értelemben vett pénz",
+          "a határidős vagy lekötött betétek összege"
+        ],
+        correct: [1],
+        explanation: "Az M1 (készpénz + látra szóló betétek) a leglikvidebb eszközöket tartalmazó, szűkebb értelemben vett pénzmennyiség."
+      },
+      {
+        id: 17,
+        topic: 2,
+        type: "single",
+        question: "A készpénz mennyisége 60 milliárd, a látraszóló bankbetétek állománya 100 milliárd, a rövidlejáratú betétek állománya 20 milliárd. Mekkora az M1?",
+        options: [
+          "160 milliárd",
+          "180 milliárd",
+          "100 milliárd"
+        ],
+        correct: [0],
+        explanation: "M1 = készpénz (60 mrd) + látra szóló betétek (100 mrd) = 160 milliárd. A rövid lejáratú lekötött betét már az M2-be tartozik."
+      },
+      {
+        id: 18,
+        topic: 2,
+        type: "tf",
+        question: "Ha a gazdasági szereplők a lekötött betétek egy részét látra szóló betétté alakítják át, akkor ennyivel csökken az M2, s ugyanennyivel növekszik az M1 mennyisége.",
+        options: ["Igaz", "Hamis"],
+        correct: [1],
+        explanation: "Hamis: Az M1 valóban nő, de mivel az M2 tartalmazza a teljes M1-et és a lekötött betéteket is, az M2 állománya változatlan marad."
+      },
+      {
+        id: 19,
+        topic: 2,
+        type: "single",
+        question: "A pénzmennyiség szabályozása a ..... irányul.",
+        options: [
+          "monetáris bázisra",
+          "az M1-re",
+          "a jegybankpénzre"
+        ],
+        correct: [0],
+        explanation: "A jegybank közvetlenül a monetáris bázis (M0) szabályozásán keresztül hat a gazdaság pénzkínálatára."
+      },
+      {
+        id: 20,
+        topic: 2,
+        type: "single",
+        question: "Melyik intézkedéssel növelhető a pénzkínálat?",
+        options: [
+          "a kötelező tartalékráta növelése",
+          "a jegybanki kamatláb csökkentése",
+          "a jegybank aranyat, devizát vagy értékpapírt ad el"
+        ],
+        correct: [1],
+        explanation: "A jegybanki irányadó kamat csökkentése olcsóbbá teszi a forráshoz jutást a kereskedelmi bankoknak, ami bővíti a hitelezést és a pénzkínálatot."
+      },
+      {
+        id: 21,
+        topic: 2,
+        type: "tf",
+        question: "A refinanszírozási kamatláb hatással van a nyílt piaci műveletekre és meghatározza a kötelező tartalékrátát.",
+        options: ["Igaz", "Hamis"],
+        correct: [1],
+        explanation: "Hamis: A refinanszírozási kamatláb, a nyílt piaci műveletek és a kötelező tartalékráta a jegybank három különálló eszköze, nem határozzák meg egymást."
+      },
+      {
+        id: 22,
+        topic: 2,
+        type: "single",
+        question: "Ha egységnyi pénzből háromszor annyi pénzt teremtenek a kereskedelmi bankok a hitelezésük révén, akkor...",
+        options: [
+          "a pénzmultiplikátor 3",
+          "a tartalékráta aránya 30%",
+          "a pénz forgási sebessége 3",
+          "a pénzmultiplikátor 1/3"
+        ],
+        correct: [0],
+        explanation: "A pénzmultiplikátor pontosan azt mutatja meg, hogy 1 egység monetáris bázisból hányszoros pénzmennyiséget képes teremteni a bankrendszer."
+      },
+      {
+        id: 23,
+        topic: 2,
+        type: "single",
+        question: "A pénz forgási sebessége...",
+        options: [
+          "megmutatja, hogy egységnyi pénzből mennyi pénzt teremtenek a kereskedelmi bankok",
+          "megmutatja, hogy egységnyi pénz egységnyi idő alatt hány tranzakcióban vesz részt",
+          "függ a készpénz-betét hányadtól"
+        ],
+        correct: [1],
+        explanation: "A forgási sebesség (V) azt méri, hogy egy adott időszak alatt átlagosan hányszor cserél gazdát egy pénzegység a tranzakciók során."
+      },
+      {
+        id: 24,
+        topic: 2,
+        type: "single",
+        question: "Ha egységnyi pénz adott időszak alatt 5 tranzakcióban vesz részt...",
+        options: [
+          "a kereskedelmi banki hitelezés révén a pénzmennyiség megötszöröződik",
+          "a pénz forgási sebessége 5",
+          "a pénzmultiplikátor 5"
+        ],
+        correct: [1],
+        explanation: "Mivel az adott időszak alatti tranzakciók számáról van szó (nem pénzteremtésről), ez a pénz forgási sebességét (V = 5) jelenti."
+      },
+      {
+        id: 25,
+        topic: 2,
+        type: "tf",
+        question: "A Fisher-féle pénzforgalmi egyenlet a reálpénzkínálat, az árszínvonal és a kibocsátás kapcsolatának összefüggését mutatja.",
+        options: ["Igaz", "Hamis"],
+        correct: [1],
+        explanation: "Hamis: A Fisher-egyenlet (M · V = P · Y) a nominális pénzmennyiség (M), a forgási sebesség (V), az árszínvonal (P) és a reálkibocsátás (Y) kapcsolatát írja le."
+      },
+      {
+        id: 26,
+        topic: 2,
+        type: "single",
+        question: "A mindennapos vásárlások lebonyolítása céljából jelentkező pénztartási igény...",
+        options: [
+          "a tranzakciós pénzkereslet",
+          "a spekulációs pénzkereslet",
+          "az óvatossági pénzkereslet"
+        ],
+        correct: [0],
+        explanation: "A folyó kiadások és mindennapi vásárlások fedezésére tartott pénz a tranzakciós pénzkereslet, amely a jövedelemmel nő."
+      },
+      {
+        id: 27,
+        topic: 2,
+        type: "single",
+        question: "Ha a vagyonomat pénzben tartom, a kötvények kamatának növekedése...",
+        options: [
+          "A vagyontartási célú keresletemet csökkenteni fogja",
+          "A vagyontartási célú keresletemet növelni fogja",
+          "Nem módosítja a vagyontartási célú keresletemet"
+        ],
+        correct: [0],
+        explanation: "A magasabb kötvénykamat megnöveli a pénztartás haszonáldozati költségét, így csökken a vagyontartási (spekulációs) pénzkereslet."
+      },
+      {
+        id: 28,
+        topic: 2,
+        type: "single",
+        question: "Ha a magánszereplők a vagyonukat a kamatnövekedés hatására államkötvénybe rakják...",
+        options: [
+          "nő a spekulációs pénzkereslet",
+          "csökken a spekulációs pénzkereslet",
+          "nő a tranzakciós pénzkereslet",
+          "csökken a tranzakciós pénzkereslet"
+        ],
+        correct: [1],
+        explanation: "A kamatemelkedés miatt a szereplők készpénz helyett kamatozó kötvényt tartanak, így visszaesik a spekulációs pénzkereslet."
+      },
+      {
+        id: 29,
+        topic: 2,
+        type: "tf",
+        question: "A vagyontartási céllal tartott pénzkészlet a piaci kamatláb függvénye, azzal azonos irányban változik.",
+        options: ["Igaz", "Hamis"],
+        correct: [1],
+        explanation: "Hamis: A vagyontartási (spekulációs) pénzkereslet a piaci kamatlábbal ellentétes irányban változik (ha nő a kamat, csökken a pénzkereslet)."
+      },
+      {
+        id: 30,
+        topic: 2,
+        type: "single",
+        question: "Az árszínvonal tartós növekedése...",
+        options: [
+          "infláció",
+          "defláció",
+          "stagfláció"
+        ],
+        correct: [0],
+        explanation: "Az általános árszínvonal tartós emelkedését és a pénz vásárlóerejének romlását inflációnak nevezzük."
+      },
+      {
+        id: 31,
+        topic: 2,
+        type: "tf",
+        question: "Az infláció az árszínvonal tartós csökkenése.",
+        options: ["Igaz", "Hamis"],
+        correct: [1],
+        explanation: "Hamis: Az árszínvonal tartós csökkenése a defláció; az infláció tartós árszínvonal-emelkedést jelent."
+      },
+      {
+        id: 32,
+        topic: 2,
+        type: "single",
+        question: "Az inflációt kiválthatja...",
+        options: [
+          "a forgalomban lévő pénzmennyiség növelése",
+          "a termelési költségek csökkenése",
+          "a lakossági bizalom növekedése"
+        ],
+        correct: [0],
+        explanation: "A pénzmennyiség túlzott növelése (keresleti/monetáris infláció) felfelé hajtja az árszínvonalat."
+      },
+      {
+        id: 33,
+        topic: 2,
+        type: "tf",
+        question: "Inflációs időszakban a gyakori bankba járás és pénzváltás költségét nevezzük cipőtalpköltségnek.",
+        options: ["Igaz", "Hamis"],
+        correct: [0],
+        explanation: "Igaz: Magas inflációnál az emberek minél kevesebb készpénzt tartanak maguknál, ezért gyakrabban vesznek fel kisebb összegeket."
+      },
+      {
+        id: 34,
+        topic: 2,
+        type: "single",
+        question: "Az infláció miatti gyakori termékátárazást …… nevezzük.",
+        options: [
+          "Menüköltségnek",
+          "Cipőtalpköltségnek",
+          "Szándékolatlan jövedelemújraelosztásnak"
+        ],
+        correct: [0],
+        explanation: "Az árcímkék, étlapok, katalógusok és rendszerek gyakori módosításának erőforrás-igénye a menüköltség."
+      },
+      {
+        id: 35,
+        topic: 2,
+        type: "multi",
+        question: "Melyek sorolhatók az infláció által okozott károk közé? (Jelöld meg az összes helyes választ!)",
+        options: [
+          "cipőtalp költségek",
+          "menüköltségek",
+          "heterogén inflációs várakozások",
+          "adórendszer merevségéből fakadó költségek",
+          "nem szándékolt jövedelem újraelosztás"
+        ],
+        correct: [0, 1, 3],
+        explanation: "A vizsgakulcs szerint a cipőtalpköltségek, a menüköltségek és az adórendszer merevségéből (pl. nominális adósávokból) fakadó költségek tartoznak ide."
+      },
+
+      // --- TÉMAKÖR 3: Fiskális és monetáris politika, IS–LM modell (36–68) ---
+      {
+        id: 36,
+        topic: 3,
+        type: "single",
+        question: "A kormányzati vásárlások...",
+        options: [
+          "a kamatlábtól függnek",
+          "a jövedelemtől függnek",
+          "a kormányzati döntéstől függnek",
+          "egyiktől sem függnek"
+        ],
+        correct: [2],
+        explanation: "A modellben a kormányzati áru- és szolgáltatásvásárlások (G) exogén tényezők, amelyek a kormányzat költségvetési döntéseitől függenek."
+      },
+      {
+        id: 37,
+        topic: 3,
+        type: "tf",
+        question: "Az adómultiplikátor megmutatja, hogy az egyösszegű adó milyen mértékben hat a háztartások kiadásaira.",
+        options: ["Igaz", "Hamis"],
+        correct: [1],
+        explanation: "Hamis: Az adómultiplikátor nem közvetlenül a háztartások kiadásaira, hanem az árupiac egyensúlyi nemzeti jövedelmére (Y) gyakorolt hatást méri."
+      },
+      {
+        id: 38,
+        topic: 3,
+        type: "tf",
+        question: "Az adómultiplikátor megmutatja, hogy az egyösszegű adó milyen mértékben hat az árupiac egyensúlyi jövedelmére.",
+        options: ["Igaz", "Hamis"],
+        correct: [0],
+        explanation: "Igaz: Képlete ΔY / ΔT = -ĉ / (1 - ĉ), ami megadja, mennyivel változik az egyensúlyi kibocsátás egységnyi adóváltozás hatására."
+      },
+      {
+        id: 39,
+        topic: 3,
+        type: "tf",
+        question: "A beruházási kereslet a piaci kamatlábbal ellentétes irányban mozog.",
+        options: ["Igaz", "Hamis"],
+        correct: [0],
+        explanation: "Igaz: Mivel I = I₀ - a·i, a kamatláb emelkedése drágítja a finanszírozást, így csökkenti a beruházási keresletet."
+      },
+      {
+        id: 40,
+        topic: 3,
+        type: "tf",
+        question: "A bruttó beruházás a pótló és bővítő jellegű beruházásokat és a készletek növelését foglalja magába.",
+        options: ["Igaz", "Hamis"],
+        correct: [0],
+        explanation: "Igaz: A bruttó beruházás az elhasználódott eszközök pótlását (amortizáció), a kapacitásbővítő beruházásokat és a készletváltozást is tartalmazza."
+      },
+      {
+        id: 41,
+        topic: 3,
+        type: "tf",
+        question: "A beruházási függvény meredekségét a piaci várakozások határozzák meg.",
+        options: ["Igaz", "Hamis"],
+        correct: [1],
+        explanation: "Hamis: A meredekséget a beruházások kamatérzékenysége (a) határozza meg; a piaci várakozások az autonóm beruházásokat (I₀) tolják el."
+      },
+      {
+        id: 42,
+        topic: 3,
+        type: "single",
+        question: "A restriktív fiskális politika...",
+        options: [
+          "célja recesszióban a kiadások növelése",
+          "célja a fellendülés időszakában a kiadások csökkentése",
+          "egyik sem"
+        ],
+        correct: [1],
+        explanation: "A restriktív (szigorító) költségvetési politika a túlfűtött gazdaság fékezését szolgálja a kormányzati kiadások csökkentésével vagy adóemeléssel."
+      },
+      {
+        id: 43,
+        topic: 3,
+        type: "single",
+        question: "Az expanzív fiskális politika...",
+        options: [
+          "eszközei közé tartozik a pénzkínálat növelése",
+          "eszközei közé tartozik a kormányzati kiadások növelése",
+          "eszközei közé tartozik az adónövelés"
+        ],
+        correct: [1],
+        explanation: "Az élénkítő költségvetési politika eszköze a kormányzati vásárlások és transzferek növelése, illetve az adók csökkentése."
+      },
+      {
+        id: 44,
+        topic: 3,
+        type: "single",
+        question: "Az expanzív monetáris politika...",
+        options: [
+          "célja a gazdaság élénkítése",
+          "a pénzkínálat csökkentése",
+          "az egyensúlyi jövedelem és az árszínvonal csökkenéséhez vezet"
+        ],
+        correct: [0],
+        explanation: "Az expanzív (laza) monetáris politika a pénzkínálat bővítésével és a kamatok csökkentésével élénkíti a gazdaságot."
+      },
+      {
+        id: 45,
+        topic: 3,
+        type: "single",
+        question: "A restriktív monetáris politika...",
+        options: [
+          "célja a gazdaság élénkítése",
+          "célja a gazdaság visszafogása",
+          "az egyensúlyi jövedelem és az árszínvonal növekedéséhez vezet"
+        ],
+        correct: [1],
+        explanation: "A szigorító monetáris politika a pénzkínálat szűkítésével és a kamatok emelésével fogja vissza a keresletet és az inflációt."
+      },
+      {
+        id: 46,
+        topic: 3,
+        type: "multi",
+        question: "Az állam (jegybank) restriktív monetáris politikája... (Jelöld meg az összes helyes választ!)",
+        options: [
+          "csökkenti a pénzkínálatot",
+          "növeli a pénzkínálatot",
+          "növeli az egyensúlyi kamatlábat a pénzpiacon",
+          "csökkenti az egyensúlyi kamatlábat a pénzpiacon"
+        ],
+        correct: [0, 2],
+        explanation: "Restriktív monetáris politikánál csökken a pénzkínálat (az LM-görbe balra tolódik), ami megemeli az egyensúlyi kamatlábat."
+      },
+      {
+        id: 47,
+        topic: 3,
+        type: "tf",
+        question: "Ha a fiskális politika növeli a jövedelmet, az IS-görbe befelé tolódik.",
+        options: ["Igaz", "Hamis"],
+        correct: [1],
+        explanation: "Hamis: A jövedelemnövelő (expanzív) fiskális politika az IS-görbét kifelé, azaz jobbra felfelé tolja el."
+      },
+      {
+        id: 48,
+        topic: 3,
+        type: "single",
+        question: "Mi okozhatja az IS-görbe jobbra felfelé tolódását?",
+        options: [
+          "Adók emelése",
+          "Adók csökkentése",
+          "Kormányzati kiadások csökkentése",
+          "A kamatláb növekedése"
+        ],
+        correct: [1],
+        explanation: "Az adócsökkentés növeli a rendelkezésre álló jövedelmet és a fogyasztást, így minden kamatszint mellett magasabb lesz a kereslet (IS jobbra tolódik)."
+      },
+      {
+        id: 49,
+        topic: 3,
+        type: "single",
+        question: "Melyik okozhatja az IS-görbe balra tolódását?",
+        options: [
+          "a kormányzati kiadások csökkenése",
+          "a fogyasztási határhajlandóság csökkenése",
+          "a beruházási kamatérzékenység csökkenése"
+        ],
+        correct: [0],
+        explanation: "A kormányzati kiadások csökkentése balra tolja az IS-görbét; a másik két tényező csak a görbe meredekségét változtatja meg."
+      },
+      {
+        id: 50,
+        topic: 3,
+        type: "single",
+        question: "Mi okozhatja az IS-görbe balra befelé tolódását?",
+        options: [
+          "Adók emelése",
+          "Adók csökkentése",
+          "Kormányzati kiadások növelése",
+          "A kamatláb csökkentése"
+        ],
+        correct: [0],
+        explanation: "Az adóemelés visszafogja a háztartások fogyasztását, így az IS-görbe balra, befelé tolódik."
+      },
+      {
+        id: 51,
+        topic: 3,
+        type: "single",
+        question: "Milyen hatással van a kormányzati kiadások növelése az egyensúlyi kibocsátásra?",
+        options: [
+          "növeli",
+          "csökkenti",
+          "nem módosítja"
+        ],
+        correct: [0],
+        explanation: "A kormányzati vásárlások növelése (G↑) élénkíti az aggregált keresletet és növeli az egyensúlyi kibocsátást (Y↑)."
+      },
+      {
+        id: 52,
+        topic: 3,
+        type: "single",
+        question: "Milyen hatással van az adócsökkentés az egyensúlyi kibocsátásra?",
+        options: [
+          "növeli",
+          "csökkenti",
+          "nem módosítja"
+        ],
+        correct: [0],
+        explanation: "Az adócsökkentés (T↓) növeli a rendelkezésre álló jövedelmet és a fogyasztást, így emeli az egyensúlyi kibocsátást (Y↑)."
+      },
+      {
+        id: 53,
+        topic: 3,
+        type: "single",
+        question: "Milyen hatással van az adócsökkentés az egyensúlyi kamatlábra?",
+        options: [
+          "csökken",
+          "nő",
+          "nem változik"
+        ],
+        correct: [1],
+        explanation: "Az adócsökkentés jobbra tolja az IS-görbét: a nagyobb jövedelem növeli a tranzakciós pénzkeresletet, ami felfelé hajtja az egyensúlyi kamatlábat."
+      },
+      {
+        id: 54,
+        topic: 3,
+        type: "single",
+        question: "Milyen hatással van a kormányzati kiadások növelése az egyensúlyi kamatlábra?",
+        options: [
+          "csökken",
+          "nő",
+          "nem változik"
+        ],
+        correct: [1],
+        explanation: "Az IS-görbe jobbra tolódása miatt növekszik a jövedelem és a tranzakciós pénzkereslet, ami változatlan pénzkínálat mellett emeli a kamatlábat."
+      },
+      {
+        id: 55,
+        topic: 3,
+        type: "single",
+        question: "Milyen hatással van a kormányzati kiadások csökkentése az egyensúlyi kamatlábra?",
+        options: [
+          "csökken",
+          "nő",
+          "nem változik"
+        ],
+        correct: [0],
+        explanation: "A kiadáscsökkentés balra tolja az IS-görbét: visszaesik a jövedelem és a tranzakciós pénzkereslet, így csökken az egyensúlyi kamatláb."
+      },
+      {
+        id: 56,
+        topic: 3,
+        type: "single",
+        question: "Ha a jegybanki irányadó kamat csökken, akkor az a...",
+        options: [
+          "pénzkínálat növekedéséhez vezet",
+          "pénzkínálat csökkenéséhez vezet",
+          "pénzkereslet növekedéséhez",
+          "pénzkínálatot nem befolyásolja"
+        ],
+        correct: [0],
+        explanation: "Az irányadó kamat csökkentése expanzív monetáris lépés, amely a hitelezés élénkítésén keresztül növeli a pénzkínálatot."
+      },
+      {
+        id: 57,
+        topic: 3,
+        type: "single",
+        question: "Milyen hatással van a jegybanki irányadó kamat csökkentése az egyensúlyi makrojövedelemre?",
+        options: [
+          "nő",
+          "csökken",
+          "nem módosítja"
+        ],
+        correct: [0],
+        explanation: "Az alacsonyabb kamat mellett az LM-görbe jobbra tolódik, olcsóbbá válnak a beruházások, így nő az egyensúlyi makrojövedelem (Y↑)."
+      },
+      {
+        id: 58,
+        topic: 3,
+        type: "single",
+        question: "Mi okozhatja az LM-görbe jobbra tolódását?",
+        options: [
+          "a jegybanki irányadó kamat csökkentése",
+          "a jegybanki irányadó kamat növelése",
+          "a jövedelem növekedése",
+          "a jövedelem csökkenése"
+        ],
+        correct: [0],
+        explanation: "A jegybanki kamatcsökkentés (pénzkínálat-bővülés) jobbra tolja az LM-görbét; a jövedelem változása csak a görbén való elmozdulást okoz."
+      },
+      {
+        id: 59,
+        topic: 3,
+        type: "single",
+        question: "Mi okozhatja az LM-görbe balra tolódását?",
+        options: [
+          "a pénzkínálat növekedése",
+          "a pénzkínálat csökkenése",
+          "a kamatláb csökkenése",
+          "pénzkereslet csökkenése"
+        ],
+        correct: [1],
+        explanation: "A pénzkínálat szűkülése (vagy a jegybanki kamat emelése) balra felfelé tolja el az LM-görbét."
+      },
+      {
+        id: 60,
+        topic: 3,
+        type: "single",
+        question: "Hogyan módosul a restriktív fiskális politika hatására az áru- és pénzpiac egyensúlya?",
+        options: [
+          "Az egyensúlyi jövedelem csökken, az egyensúlyi kamatláb nő",
+          "Az egyensúlyi jövedelem csökken, az egyensúlyi kamatláb csökken",
+          "Az egyensúlyi jövedelem nő, az egyensúlyi kamatláb nő",
+          "Az egyensúlyi jövedelem nő, az egyensúlyi kamatláb csökken"
+        ],
+        correct: [1],
+        explanation: "Az IS-görbe balra tolódik, ezért csökken a kibocsátás (Y↓), a kisebb pénzkereslet pedig lefelé nyomja a kamatlábat is (i↓)."
+      },
+      {
+        id: 61,
+        topic: 3,
+        type: "single",
+        question: "Hogyan módosul az expanzív fiskális politika hatására az áru- és pénzpiac egyensúlya?",
+        options: [
+          "Az egyensúlyi jövedelem csökken, az egyensúlyi kamatláb nő",
+          "Az egyensúlyi jövedelem csökken, az egyensúlyi kamatláb csökken",
+          "Az egyensúlyi jövedelem nő, az egyensúlyi kamatláb nő",
+          "Az egyensúlyi jövedelem nő, az egyensúlyi kamatláb csökken"
+        ],
+        correct: [2],
+        explanation: "Az IS-görbe jobbra tolódik: nő az egyensúlyi jövedelem (Y↑), a nagyobb tranzakciós pénzkereslet pedig megemeli a kamatlábat (i↑)."
+      },
+      {
+        id: 62,
+        topic: 3,
+        type: "single",
+        question: "Hogyan módosul az expanzív monetáris politika hatására a pénz- és árupiac egyensúlya?",
+        options: [
+          "Az egyensúlyi kamatláb csökken, az egyensúlyi jövedelem nő",
+          "Az egyensúlyi kamatláb csökken, az egyensúlyi jövedelem csökken",
+          "Az egyensúlyi kamatláb nő, az egyensúlyi jövedelem nő",
+          "Az egyensúlyi kamatláb nő, az egyensúlyi jövedelem csökken"
+        ],
+        correct: [0],
+        explanation: "Az LM-görbe jobbra tolódik: a pénzbőség csökkenti a kamatlábat (i↓), ami élénkíti a beruházásokat és növeli a jövedelmet (Y↑)."
+      },
+      {
+        id: 63,
+        topic: 3,
+        type: "single",
+        question: "Hogyan módosul a restriktív monetáris politika hatására a pénz- és árupiac egyensúlya?",
+        options: [
+          "Az egyensúlyi kamatláb csökken, az egyensúlyi jövedelem nő",
+          "Az egyensúlyi kamatláb csökken, az egyensúlyi jövedelem csökken",
+          "Az egyensúlyi kamatláb nő, az egyensúlyi jövedelem nő",
+          "Az egyensúlyi kamatláb nő, az egyensúlyi jövedelem csökken"
+        ],
+        correct: [3],
+        explanation: "Az LM-görbe balra tolódik: a pénzszűke megemeli a kamatlábat (i↑), a drágább hitel pedig visszafogja a beruházásokat és a jövedelmet (Y↓)."
+      },
+      {
+        id: 64,
+        topic: 3,
+        type: "single",
+        question: "Mi történik, ha a restriktív fiskális politikai beavatkozást egy expanzív monetáris politikai döntés követ?",
+        options: [
+          "Az egyensúlyi jövedelem csökken, az egyensúlyi kamatláb csökken",
+          "Az egyensúlyi jövedelem csökken, az egyensúlyi kamatláb nő",
+          "Az egyensúlyi jövedelem csökken, az egyensúlyi kamatláb változatlan"
+        ],
+        correct: [0],
+        explanation: "Mind a restriktív fiskális politika (IS balra), mind az expanzív monetáris politika (LM jobbra) csökkenti a kamatlábat, a megadott opciók közül pedig a jövedelem is csökken."
+      },
+      {
+        id: 65,
+        topic: 3,
+        type: "single",
+        question: "Ha nőnek az adók, milyen monetáris politikai lépésre van szükség a recesszió elkerüléséhez?",
+        options: [
+          "Restriktív monetáris politikára",
+          "Expanzív monetáris politikára",
+          "Nem tudjuk megakadályozni a recessziót"
+        ],
+        correct: [1],
+        explanation: "Az adóemelés visszafogja a keresletet (IS balra), amit expanzív monetáris politikával (LM jobbra, kamatcsökkentéssel) lehet ellensúlyozni."
+      },
+      {
+        id: 66,
+        topic: 3,
+        type: "single",
+        question: "A jegybanki alapkamat növelése csökkenti vagy növeli az aggregált keresletet?",
+        options: [
+          "Csökkenti",
+          "Növeli"
+        ],
+        correct: [0],
+        explanation: "A magasabb alapkamat drágítja a hiteleket és ösztönzi a megtakarítást, így visszaveti a beruházásokat és a fogyasztást (csökkenti az AD-t)."
+      },
+      {
+        id: 67,
+        topic: 3,
+        type: "tf",
+        question: "Az állam által a magánszektornak eladott értékpapírok hatására a gazdaságban emelkedhet a kamatláb, ez pedig csökkenti a beruházásokat és a keresletet, érvényesülhet a kiszorító hatás.",
+        options: ["Igaz", "Hamis"],
+        correct: [0],
+        explanation: "Igaz: A költségvetési hiány állampapír-kibocsátással történő finanszírozása felszívja a megtakarításokat, megemeli a kamatot és kiszorítja a magánberuházásokat."
+      },
+      {
+        id: 68,
+        topic: 3,
+        type: "single",
+        question: "Az államadósság állománya megegyezik...",
+        options: [
+          "az adott időszaki költségvetési deficittel",
+          "a nemzetgazdaság magánszektorában mért adott időszaki adósságállománnyal",
+          "a nem állami szektor állammal szembeni követeléseinek összértékével",
+          "a költségvetés kiadásainak és adóbevételeinek különbségével"
+        ],
+        correct: [2],
+        explanation: "Az államadósság állományi mutató, amely a korábbi hiányok felhalmozódásából eredő, a nem állami szektor által tartott állammal szembeni követelések összértéke."
+      },
+
+      // --- TÉMAKÖR 4: AD–AS modell, munkaerőpiac és infláció–munkanélküliség (69–80) ---
+      {
+        id: 69,
+        topic: 4,
+        type: "single",
+        question: "Rövid távon...",
+        options: [
+          "a kereslet követi a kínálatot",
+          "az árak és a bérek ragadósságát feltételezzük",
+          "az árak és bérek rugalmasságát feltételezzük"
+        ],
+        correct: [1],
+        explanation: "A keynesi rövid távú szemlélet alapfeltevése, hogy a nominálbérek és az árak merevek (ragadósak), így a kibocsátás a kereslethez alkalmazkodik."
+      },
+      {
+        id: 70,
+        topic: 4,
+        type: "tf",
+        question: "A rögzített nominálbérek esetén az áru-, pénz- és értékpapírpiac egyensúlya mellett a munkanélküliség esélye minimális.",
+        options: ["Igaz", "Hamis"],
+        correct: [1],
+        explanation: "Hamis: Mivel a nominálbérek ragadósak és nem tudnak lefelé rugalmasan alkalmazkodni, az áru- és pénzpiaci egyensúly mellett is fennmaradhat jelentős kényszerű munkanélküliség."
+      },
+      {
+        id: 71,
+        topic: 4,
+        type: "tf",
+        question: "Ha a gazdaságban növekszik a rögzített nominálbér szintje, akkor a makrokínálati függvény jobbra tolódik.",
+        options: ["Igaz", "Hamis"],
+        correct: [1],
+        explanation: "Hamis: A magasabb bér magasabb termelési költséget jelent a vállalatoknak, ezért a rövid távú kínálati görbe (SRAS) balra felfelé tolódik."
+      },
+      {
+        id: 72,
+        topic: 4,
+        type: "tf",
+        question: "Az összkeresleti (aggregált keresleti) függvény az áruk iránti reálkereslet és a piaci ár közötti kapcsolatot fejezi ki adott pénzmennyiség mellett.",
+        options: ["Igaz", "Hamis"],
+        correct: [1],
+        explanation: "Hamis: Az AD-görbe az általános árszínvonal (P) és az összkibocsátás (Y) kapcsolatát mutatja, nem pusztán adott pénzmennyiség, hanem adott fiskális és monetáris politika mellett."
+      },
+      {
+        id: 73,
+        topic: 4,
+        type: "tf",
+        question: "Az AD-görbe tehát azt az áru- és szolgáltatásmennyiséget (Y) mutatja, amelyet a gazdasági szereplők különböző P árszínvonal mellett, minden más tényezőt változatlanul hagyva, hajlandóak és képesek megvásárolni.",
+        options: ["Igaz", "Hamis"],
+        correct: [0],
+        explanation: "Igaz: Ez az aggregált keresleti (AD) görbe pontos közgazdasági definíciója."
+      },
+      {
+        id: 74,
+        topic: 4,
+        type: "single",
+        question: "Mi okozhat adott árszínvonal mellett jövedelemnövekedést (AD-görbe jobbra tolódását)?",
+        options: [
+          "a pénzkínálat növelése, kormányzati vásárlások növelése, adók csökkentése, transzferek növelése",
+          "a pénzkínálat csökkentése, kormányzati vásárlások csökkentése, adók növelése, transzferek csökkentése",
+          "a tőke és munka termelési tényezők növelése, hatékonyabb termelési eljárások alkalmazása"
+        ],
+        correct: [0],
+        explanation: "Az expanzív monetáris és fiskális intézkedések élénkítik az összkeresletet, ezért adott árszínvonal mellett is növelik a kibocsátást (AD jobbra tolódik)."
+      },
+      {
+        id: 75,
+        topic: 4,
+        type: "single",
+        question: "Mi okozhatja a hosszú távú aggregált kínálati görbe (LRAS) eltolódását jobbra, egyben a gazdaság élénkítését?",
+        options: [
+          "a pénzkínálat növelése, kormányzati vásárlások növelése, adók csökkentése, transzferek növelése",
+          "a pénzkínálat csökkentése, kormányzati vásárlások csökkentése, adók növelése, transzferek csökkentése",
+          "a tőke és munka termelési tényezők növelése, hatékonyabb termelési eljárások alkalmazása"
+        ],
+        correct: [2],
+        explanation: "A gazdaság potenciális kibocsátását (LRAS) a termelési tényezők (munka, tőke) bővülése és a technológiai fejlődés tolja jobbra."
+      },
+      {
+        id: 76,
+        topic: 4,
+        type: "single",
+        question: "A rövid és hosszú távú egyensúly esetén az AD–AS modellben:",
+        options: [
+          "Az AD, LRAS függvények egy pontban metszik egymást",
+          "Az AD, LRAS és SRAS függvények egy pontban metszik egymást"
+        ],
+        correct: [1],
+        explanation: "Teljes makrogazdasági egyensúlyban a gazdaság a potenciális kibocsátási szinten termel, ahol az AD, az SRAS és az LRAS görbe egyetlen pontban metszi egymást."
+      },
+      {
+        id: 77,
+        topic: 4,
+        type: "single",
+        question: "A stagfláció esetén...",
+        options: [
+          "Y csökken, P nő, munkanélküliség nő",
+          "Y nő, P csökken, munkanélküliség csökken"
+        ],
+        correct: [0],
+        explanation: "A stagfláció (stagnálás + infláció) negatív kínálati sokk hatására alakul ki: visszaesik a kibocsátás (Y↓), nő a munkanélküliség, miközben emelkedik az árszínvonal (P↑)."
+      },
+      {
+        id: 78,
+        topic: 4,
+        type: "single",
+        question: "Aggregált keresleti sokkot (negatív sokk esetén) a kormányzat ellensúlyozhatja:",
+        options: [
+          "Expanzív fiskális politikával",
+          "Restriktív fiskális politikával"
+        ],
+        correct: [0],
+        explanation: "Negatív keresleti sokk (AD balra tolódása) esetén expanzív fiskális politikával (kiadásnöveléssel vagy adócsökkentéssel) állítható vissza az eredeti egyensúly."
+      },
+      {
+        id: 79,
+        topic: 4,
+        type: "single",
+        question: "Aggregált kínálati sokkot (negatív kínálati sokk, azaz kibocsátáscsökkenés esetén) a kormányzat ellensúlyozhatja:",
+        options: [
+          "A kereslet növelésével",
+          "A kereslet csökkentésével"
+        ],
+        correct: [0],
+        explanation: "A kibocsátás és a foglalkoztatás gyors visszaállítása érdekében a kormányzat a kereslet növelésével (élénkítéssel) reagálhat, bár ez magasabb árszínvonallal jár."
+      },
+      {
+        id: 80,
+        topic: 4,
+        type: "single",
+        question: "Rövid távon az infláció visszaszorítása...",
+        options: [
+          "növeli a munkanélküliséget",
+          "csökkenti a munkanélküliséget"
+        ],
+        correct: [0],
+        explanation: "A rövid távú Phillips-görbe átváltása miatt az infláció restriktív politikával történő leszorítása kibocsátás-visszaeséssel és magasabb munkanélküliséggel jár."
+      }
+    ];
+
+    // =========================================================================
+    // 2. ÁLLAPOTKEZELÉS ÉS SEGÉDFÜGGVÉNYEK
+    // =========================================================================
+    const state = {
+      mode: "all", // 'all' | 'topic' | 'wrong'
+      selectedTopicId: null,
+      activeQuestions: [],
+      currentIndex: 0,
+      answered: false,
+      selectedMultiIndices: new Set(),
+      results: [], // { questionId, topic, isCorrect }
+      lastSessionPool: []
+    };
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    // =========================================================================
+    // 3. DOM ELEMEK HIVATKOZÁSAI
+    // =========================================================================
+    const menuView = document.getElementById("menuView");
+    const quizView = document.getElementById("quizView");
+    const resultView = document.getElementById("resultView");
+
+    const topicCardsGrid = document.getElementById("topicCardsGrid");
+    const startAllShuffledBtn = document.getElementById("startAllShuffledBtn");
+    const shuffleOptionsToggle = document.getElementById("shuffleOptionsToggle");
+
+    const homeBtn = document.getElementById("homeBtn");
+    const backToMenuBtn = document.getElementById("backToMenuBtn");
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    const liveStatsBadge = document.getElementById("liveStatsBadge");
+    const liveCorrect = document.getElementById("liveCorrect");
+    const livePercent = document.getElementById("livePercent");
+
+    const quizTopicTag = document.getElementById("quizTopicTag");
+    const quizProgressText = document.getElementById("quizProgressText");
+    const quizProgressBar = document.getElementById("quizProgressBar");
+    const questionTypeBadge = document.getElementById("questionTypeBadge");
+    const questionText = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+    const multiSubmitWrapper = document.getElementById("multiSubmitWrapper");
+    const submitMultiBtn = document.getElementById("submitMultiBtn");
+
+    const feedbackBox = document.getElementById("feedbackBox");
+    const feedbackIcon = document.getElementById("feedbackIcon");
+    const feedbackTitle = document.getElementById("feedbackTitle");
+    const feedbackExplanation = document.getElementById("feedbackExplanation");
+    const nextQuestionBtn = document.getElementById("nextQuestionBtn");
+    const nextBtnLabel = document.getElementById("nextBtnLabel");
+
+    const resultBadge = document.getElementById("resultBadge");
+    const finalScoreText = document.getElementById("finalScoreText");
+    const finalPercentText = document.getElementById("finalPercentText");
+    const finalWrongCount = document.getElementById("finalWrongCount");
+    const topicBreakdownContainer = document.getElementById("topicBreakdownContainer");
+    const retryWrongBtn = document.getElementById("retryWrongBtn");
+    const retryWrongLabel = document.getElementById("retryWrongLabel");
+    const restartSameModeBtn = document.getElementById("restartSameModeBtn");
+    const resultToMenuBtn = document.getElementById("resultToMenuBtn");
+
+    // =========================================================================
+    // 4. TÉMA (DARK / LIGHT) KEZELÉSE
+    // =========================================================================
+    function initTheme() {
+      const saved = localStorage.getItem("makro_quiz_theme");
+      if (saved === "dark" || (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }
+
+    themeToggleBtn.addEventListener("click", () => {
+      const isDark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("makro_quiz_theme", isDark ? "dark" : "light");
+    });
+
+    // =========================================================================
+    // 5. NÉZETVÁLTÁS ÉS MENÜ RENDERELÉSE
+    // =========================================================================
+    function showView(viewName) {
+      menuView.classList.add("hidden");
+      quizView.classList.add("hidden");
+      resultView.classList.add("hidden");
+
+      if (viewName === "menu") {
+        menuView.classList.remove("hidden");
+        liveStatsBadge.classList.add("hidden");
+        liveStatsBadge.classList.remove("flex");
+        backToMenuBtn.classList.add("hidden");
+      } else if (viewName === "quiz") {
+        quizView.classList.remove("hidden");
+        liveStatsBadge.classList.remove("hidden");
+        liveStatsBadge.classList.add("flex");
+        backToMenuBtn.classList.remove("hidden");
+      } else if (viewName === "result") {
+        resultView.classList.remove("hidden");
+        liveStatsBadge.classList.add("hidden");
+        liveStatsBadge.classList.remove("flex");
+        backToMenuBtn.classList.remove("hidden");
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderTopicCards() {
+      topicCardsGrid.innerHTML = "";
+      const colorMap = {
+        indigo: "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 border-indigo-200/70 dark:border-indigo-900/60",
+        emerald: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-900/60",
+        amber: "bg-amber-50 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300 border-amber-200/70 dark:border-amber-900/60",
+        rose: "bg-rose-50 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border-rose-200/70 dark:border-rose-900/60"
+      };
+
+      TOPICS.forEach((topic) => {
+        const count = QUESTIONS.filter((q) => q.topic === topic.id).length;
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "text-left bg-white dark:bg-slate-900 hover:border-indigo-400 dark:hover:border-indigo-500 rounded-3xl p-6 shadow-sm border border-slate-200/80 dark:border-slate-800 transition group flex flex-col justify-between gap-4";
+        card.innerHTML = `
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold border ${colorMap[topic.accent]}">
+                ${topic.id}. témakör
+              </span>
+              <span class="text-xs font-semibold text-slate-400 dark:text-slate-500">
+                ${count} kérdés
+              </span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
+              ${topic.title}
+            </h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              ${topic.description}
+            </p>
+          </div>
+          <div class="flex items-center gap-1.5 text-sm font-bold text-indigo-600 dark:text-indigo-400 pt-1">
+            <span>Témakör indítása</span>
+            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </div>
+        `;
+        card.addEventListener("click", () => startQuiz("topic", topic.id));
+        topicCardsGrid.appendChild(card);
+      });
+    }
+
+    // =========================================================================
+    // 6. KVÍZ INDÍTÁSA ÉS KÉRDÉS MEGJELENÍTÉSE
+    // =========================================================================
+    function prepareQuestionInstance(rawQuestion) {
+      const shouldShuffleOpts = shuffleOptionsToggle.checked && rawQuestion.type !== "tf";
+      const indexedOptions = rawQuestion.options.map((text, idx) => ({
+        text,
+        isCorrect: rawQuestion.correct.includes(idx)
+      }));
+
+      const finalOptions = shouldShuffleOpts ? shuffleArray(indexedOptions) : indexedOptions;
+
+      return {
+        ...rawQuestion,
+        preparedOptions: finalOptions
+      };
+    }
+
+    function startQuiz(mode, topicId = null, customPool = null) {
+      state.mode = mode;
+      state.selectedTopicId = topicId;
+      state.currentIndex = 0;
+      state.results = [];
+      state.answered = false;
+      state.selectedMultiIndices.clear();
+
+      let pool = [];
+      if (mode === "all") {
+        pool = shuffleArray(QUESTIONS);
+      } else if (mode === "topic") {
+        pool = QUESTIONS.filter((q) => q.topic === topicId);
+      } else if (mode === "wrong" && customPool) {
+        pool = shuffleArray(customPool);
+      }
+
+      state.lastSessionPool = pool;
+      state.activeQuestions = pool.map(prepareQuestionInstance);
+
+      updateLiveStats();
+      showView("quiz");
+      renderCurrentQuestion();
+    }
+
+    function updateLiveStats() {
+      const answeredCount = state.results.length;
+      const correctCount = state.results.filter((r) => r.isCorrect).length;
+      const pct = answeredCount === 0 ? 0 : Math.round((correctCount / answeredCount) * 100);
+
+      liveCorrect.textContent = `${correctCount} helyes`;
+      livePercent.textContent = `${pct}%`;
+    }
+
+    function renderCurrentQuestion() {
+      const total = state.activeQuestions.length;
+      const current = state.activeQuestions[state.currentIndex];
+      const topicObj = TOPICS.find((t) => t.id === current.topic);
+
+      state.answered = false;
+      state.selectedMultiIndices.clear();
+
+      // Haladás és címkék
+      quizTopicTag.textContent = topicObj ? topicObj.shortTitle : "Makroökonómia";
+      quizProgressText.textContent = `${state.currentIndex + 1} / ${total} kérdés`;
+      const progressPct = ((state.currentIndex) / total) * 100;
+      quizProgressBar.style.width = `${progressPct}%`;
+
+      if (current.type === "tf") {
+        questionTypeBadge.textContent = "Igaz / Hamis";
+      } else if (current.type === "multi") {
+        questionTypeBadge.textContent = "Több válaszos (jelölőnégyzet)";
+      } else {
+        questionTypeBadge.textContent = "Feleletválasztós";
+      }
+
+      questionText.textContent = current.question;
+
+      // Visszajelzés elrejtése
+      feedbackBox.classList.add("hidden");
+      nextQuestionBtn.disabled = true;
+      nextBtnLabel.textContent = state.currentIndex === total - 1 ? "Eredmény megtekintése" : "Következő kérdés";
+
+      // Opciók generálása
+      optionsContainer.innerHTML = "";
+      if (current.type === "multi") {
+        multiSubmitWrapper.classList.remove("hidden");
+        submitMultiBtn.disabled = true;
+      } else {
+        multiSubmitWrapper.classList.add("hidden");
+      }
+
+      const letters = ["A", "B", "C", "D", "E"];
+
+      current.preparedOptions.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.index = idx;
+        btn.className = "option-btn w-full text-left p-4 sm:p-4.5 rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 transition flex items-center gap-3.5 group";
+
+        const badgeContent = current.type === "multi"
+          ? `<span class="multi-check w-6 h-6 rounded-lg border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-xs font-bold shrink-0 transition"></span>`
+          : `<span class="option-letter w-7 h-7 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs font-extrabold shrink-0 group-hover:border-indigo-400 transition">${letters[idx] || idx + 1}</span>`;
+
+        btn.innerHTML = `
+          ${badgeContent}
+          <span class="text-sm sm:text-base font-medium text-slate-800 dark:text-slate-100 leading-snug flex-1">${opt.text}</span>
+          <span class="status-icon shrink-0 hidden text-lg font-bold"></span>
+        `;
+
+        if (current.type === "multi") {
+          btn.addEventListener("click", () => toggleMultiOption(idx, btn));
+        } else {
+          btn.addEventListener("click", () => evaluateSingleChoice(idx));
+        }
+
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    // =========================================================================
+    // 7. VÁLASZOK KIÉRTÉKELÉSE
+    // =========================================================================
+    function toggleMultiOption(idx, btn) {
+      if (state.answered) return;
+
+      const checkBox = btn.querySelector(".multi-check");
+      if (state.selectedMultiIndices.has(idx)) {
+        state.selectedMultiIndices.delete(idx);
+        btn.classList.remove("border-indigo-600", "bg-indigo-50/70", "dark:border-indigo-500", "dark:bg-indigo-950/50");
+        btn.classList.add("border-slate-200", "dark:border-slate-800");
+        checkBox.classList.remove("bg-indigo-600", "border-indigo-600", "text-white");
+        checkBox.textContent = "";
+      } else {
+        state.selectedMultiIndices.add(idx);
+        btn.classList.remove("border-slate-200", "dark:border-slate-800");
+        btn.classList.add("border-indigo-600", "bg-indigo-50/70", "dark:border-indigo-500", "dark:bg-indigo-950/50");
+        checkBox.classList.add("bg-indigo-600", "border-indigo-600", "text-white");
+        checkBox.textContent = "✓";
+      }
+
+      submitMultiBtn.disabled = state.selectedMultiIndices.size === 0;
+    }
+
+    submitMultiBtn.addEventListener("click", () => {
+      if (state.answered || state.selectedMultiIndices.size === 0) return;
+      evaluateMultiChoice();
+    });
+
+    function evaluateSingleChoice(chosenIdx) {
+      if (state.answered) return;
+      state.answered = true;
+
+      const current = state.activeQuestions[state.currentIndex];
+      const isCorrect = current.preparedOptions[chosenIdx].isCorrect;
+
+      const buttons = optionsContainer.querySelectorAll(".option-btn");
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        btn.classList.remove("hover:border-indigo-400", "dark:hover:border-indigo-500", "hover:bg-indigo-50/40", "dark:hover:bg-indigo-950/30");
+        const opt = current.preparedOptions[idx];
+        const statusIcon = btn.querySelector(".status-icon");
+
+        if (opt.isCorrect) {
+          btn.classList.remove("border-slate-200", "dark:border-slate-800", "bg-slate-50/60", "dark:bg-slate-800/40");
+          btn.classList.add("border-emerald-500", "bg-emerald-50", "dark:bg-emerald-950/50", "dark:border-emerald-500");
+          statusIcon.textContent = "✓";
+          statusIcon.classList.remove("hidden");
+          statusIcon.classList.add("text-emerald-600", "dark:text-emerald-400");
+        } else if (idx === chosenIdx && !opt.isCorrect) {
+          btn.classList.remove("border-slate-200", "dark:border-slate-800", "bg-slate-50/60", "dark:bg-slate-800/40");
+          btn.classList.add("border-rose-500", "bg-rose-50", "dark:bg-rose-950/50", "dark:border-rose-500");
+          statusIcon.textContent = "✕";
+          statusIcon.classList.remove("hidden");
+          statusIcon.classList.add("text-rose-600", "dark:text-rose-400");
+        } else {
+          btn.classList.add("opacity-60");
+        }
+      });
+
+      finalizeQuestionStep(current, isCorrect);
+    }
+
+    function evaluateMultiChoice() {
+      state.answered = true;
+      submitMultiBtn.disabled = true;
+
+      const current = state.activeQuestions[state.currentIndex];
+      const correctIndices = new Set();
+      current.preparedOptions.forEach((opt, idx) => {
+        if (opt.isCorrect) correctIndices.add(idx);
+      });
+
+      const isCorrect =
+        correctIndices.size === state.selectedMultiIndices.size &&
+        [...correctIndices].every((idx) => state.selectedMultiIndices.has(idx));
+
+      const buttons = optionsContainer.querySelectorAll(".option-btn");
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        const opt = current.preparedOptions[idx];
+        const wasSelected = state.selectedMultiIndices.has(idx);
+        const statusIcon = btn.querySelector(".status-icon");
+
+        btn.classList.remove("border-indigo-600", "bg-indigo-50/70", "dark:border-indigo-500", "dark:bg-indigo-950/50", "border-slate-200", "dark:border-slate-800");
+
+        if (opt.isCorrect) {
+          btn.classList.add("border-emerald-500", "bg-emerald-50", "dark:bg-emerald-950/50");
+          statusIcon.textContent = wasSelected ? "✓" : "✓ (hiányzott)";
+          statusIcon.classList.remove("hidden");
+          statusIcon.classList.add("text-emerald-600", "dark:text-emerald-400", "text-xs", "sm:text-sm");
+        } else if (wasSelected && !opt.isCorrect) {
+          btn.classList.add("border-rose-500", "bg-rose-50", "dark:bg-rose-950/50");
+          statusIcon.textContent = "✕";
+          statusIcon.classList.remove("hidden");
+          statusIcon.classList.add("text-rose-600", "dark:text-rose-400");
+        } else {
+          btn.classList.add("border-slate-200", "dark:border-slate-800", "opacity-55");
+        }
+      });
+
+      finalizeQuestionStep(current, isCorrect);
+    }
+
+    function finalizeQuestionStep(currentQuestion, isCorrect) {
+      state.results.push({
+        questionId: currentQuestion.id,
+        topic: currentQuestion.topic,
+        isCorrect
+      });
+
+      updateLiveStats();
+
+      // Haladási sáv frissítése az aktuális kérdés teljesítésével
+      const total = state.activeQuestions.length;
+      quizProgressBar.style.width = `${((state.currentIndex + 1) / total) * 100}%`;
+
+      // Visszajelző doboz megjelenítése
+      feedbackBox.classList.remove(
+        "hidden",
+        "bg-emerald-50", "border-emerald-200", "text-emerald-900", "dark:bg-emerald-950/40", "dark:border-emerald-800/70", "dark:text-emerald-100",
+        "bg-rose-50", "border-rose-200", "text-rose-900", "dark:bg-rose-950/40", "dark:border-rose-800/70", "dark:text-rose-100"
+      );
+
+      if (isCorrect) {
+        feedbackBox.classList.add("bg-emerald-50", "border-emerald-200", "text-emerald-900", "dark:bg-emerald-950/40", "dark:border-emerald-800/70", "dark:text-emerald-100");
+        feedbackIcon.className = "w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 font-bold text-sm bg-emerald-600 text-white";
+        feedbackIcon.textContent = "✓";
+        feedbackTitle.textContent = "Helyes válasz!";
+      } else {
+        feedbackBox.classList.add("bg-rose-50", "border-rose-200", "text-rose-900", "dark:bg-rose-950/40", "dark:border-rose-800/70", "dark:text-rose-100");
+        feedbackIcon.className = "w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 font-bold text-sm bg-rose-600 text-white";
+        feedbackIcon.textContent = "!";
+        feedbackTitle.textContent = "Nem egészen – nézzük meg, miért:";
+      }
+
+      feedbackExplanation.textContent = currentQuestion.explanation;
+      nextQuestionBtn.disabled = false;
+    }
+
+    function goToNextQuestion() {
+      if (!state.answered) return;
+
+      if (state.currentIndex < state.activeQuestions.length - 1) {
+        state.currentIndex++;
+        renderCurrentQuestion();
+      } else {
+        renderSummary();
+      }
+    }
+
+    nextQuestionBtn.addEventListener("click", goToNextQuestion);
+
+    // Billentyűzet támogatás (Enter / Space)
+    document.addEventListener("keydown", (e) => {
+      if (quizView.classList.contains("hidden")) return;
+
+      if (e.key === "Enter" || e.key === " ") {
+        // Ha fókuszban van egy opciógomb és még nincs megválaszolva, hagyjuk a natív kattintást
+        if (!state.answered) {
+          const current = state.activeQuestions[state.currentIndex];
+          if (current && current.type === "multi" && state.selectedMultiIndices.size > 0 && e.key === "Enter") {
+            e.preventDefault();
+            evaluateMultiChoice();
+          }
+          return;
+        }
+        e.preventDefault();
+        goToNextQuestion();
+      }
+    });
+
+    // =========================================================================
+    // 8. ÖSSZESÍTŐ EREDMÉNYKÁRTYA ÉS HIBÁS KÉRDÉSEK ÚJRAPRÓBÁLÁSA
+    // =========================================================================
+    function renderSummary() {
+      showView("result");
+
+      const total = state.results.length;
+      const correctCount = state.results.filter((r) => r.isCorrect).length;
+      const wrongResults = state.results.filter((r) => !r.isCorrect);
+      const pct = total === 0 ? 0 : Math.round((correctCount / total) * 100);
+
+      finalScoreText.textContent = `${correctCount} / ${total}`;
+      finalPercentText.textContent = `${pct}%`;
+      finalWrongCount.textContent = `${wrongResults.length}`;
+
+      if (pct >= 85) {
+        resultBadge.textContent = "Kiváló felkészültség!";
+        resultBadge.className = "inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300";
+      } else if (pct >= 60) {
+        resultBadge.textContent = "Jó alapok – gyakorold még a hibásakat!";
+        resultBadge.className = "inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300";
+      } else {
+        resultBadge.textContent = "Érdemes még átismételni!";
+        resultBadge.className = "inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300";
+      }
+
+      // Témakörönkénti bontás
+      topicBreakdownContainer.innerHTML = "";
+      TOPICS.forEach((topic) => {
+        const topicResults = state.results.filter((r) => r.topic === topic.id);
+        if (topicResults.length === 0) return;
+
+        const tCorrect = topicResults.filter((r) => r.isCorrect).length;
+        const tTotal = topicResults.length;
+        const tPct = Math.round((tCorrect / tTotal) * 100);
+
+        const barColor = tPct >= 80 ? "bg-emerald-500" : tPct >= 50 ? "bg-amber-500" : "bg-rose-500";
+
+        const row = document.createElement("div");
+        row.className = "p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-2";
+        row.innerHTML = `
+          <div class="flex items-center justify-between gap-2 text-sm">
+            <span class="font-semibold text-slate-800 dark:text-slate-200">${topic.shortTitle}</span>
+            <span class="font-bold text-slate-700 dark:text-slate-300">${tCorrect} / ${tTotal} (${tPct}%)</span>
+          </div>
+          <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div class="h-full ${barColor} rounded-full transition-all duration-500" style="width: ${tPct}%"></div>
+          </div>
+        `;
+        topicBreakdownContainer.appendChild(row);
+      });
+
+      // "Csak a hibás kérdések újrapróbálása" gomb kezelése
+      if (wrongResults.length > 0) {
+        retryWrongBtn.classList.remove("hidden");
+        retryWrongLabel.textContent = `Csak a hibás kérdések újrapróbálása (${wrongResults.length} db)`;
+      } else {
+        retryWrongBtn.classList.add("hidden");
+      }
+    }
+
+    retryWrongBtn.addEventListener("click", () => {
+      const wrongIds = new Set(state.results.filter((r) => !r.isCorrect).map((r) => r.questionId));
+      const wrongPool = QUESTIONS.filter((q) => wrongIds.has(q.id));
+      if (wrongPool.length > 0) {
+        startQuiz("wrong", null, wrongPool);
+      }
+    });
+
+    restartSameModeBtn.addEventListener("click", () => {
+      if (state.mode === "wrong") {
+        startQuiz("wrong", null, state.lastSessionPool);
+      } else {
+        startQuiz(state.mode, state.selectedTopicId);
+      }
+    });
+
+    // =========================================================================
+    // 9. NAVIGÁCIÓS ESEMÉNYKEZELŐK ÉS INDÍTÁS
+    // =========================================================================
+    startAllShuffledBtn.addEventListener("click", () => startQuiz("all"));
+    homeBtn.addEventListener("click", () => showView("menu"));
+    backToMenuBtn.addEventListener("click", () => showView("menu"));
+    resultToMenuBtn.addEventListener("click", () => showView("menu"));
+
+    initTheme();
+    renderTopicCards();
+    showView("menu");
+  </script>
+</body>
+</html>
